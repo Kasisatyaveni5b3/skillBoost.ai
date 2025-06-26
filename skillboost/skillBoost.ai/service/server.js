@@ -9,8 +9,8 @@ dotenv.config();
 app.use(express.json());
 
 app.post("/api/ask", async (req, res) => {
-    const { topic, question } = req.body;
-    const prompt = `Answer this ${topic} interview question clearly: ${question}`;
+    const { topic, question,experience } = req.body;
+    const prompt = `Answer this ${topic} interview question clearly: ${question} with ${experience} level`;
     try {
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
@@ -37,6 +37,19 @@ app.post("/api/ask", async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+ let  history =[]
+app.post("/api/history",async (req,res) => {
+    const {topic,question,answer} = req.body;
+    try {
+   
+      const newTopic = {topic,question,answer};
+      history.push(newTopic)
+      res.json(history);
+    } catch(err) {
+
+    }
+})
 
 app.listen(5000, () => {
     console.log("Server running on http://localhost:5000");
