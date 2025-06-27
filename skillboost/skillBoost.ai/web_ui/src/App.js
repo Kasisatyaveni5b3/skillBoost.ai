@@ -5,6 +5,7 @@ import Practise from './pages/practise';
 import Profile from './pages/profile';
 import Admin from './pages/admin';
 import Navbar from './components/navbar';
+import SignUp from './pages/signup';
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -18,6 +19,7 @@ function App() {
   <Route path="practise" element={<Practise />} />
   <Route path="profile" element={<Profile />} />
   <Route path="admin" element={<Admin />} />
+  <Route path="signup" element={<SignUp />} />
 </Route>
 
         </Routes>

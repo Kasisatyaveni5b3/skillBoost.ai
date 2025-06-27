@@ -22,9 +22,6 @@ export default function Navbar() {
           <Link to="/practise" style={linkStyle}>
             Practice
           </Link>
-          <Link to="/admin" style={linkStyle}>
-            Admin
-          </Link>
           <Link to="/profile" style={linkStyle}>
             Profile
           </Link>

@@ -27,9 +27,14 @@ export default function Home() {
     },
   ];
 
+const user = JSON.parse(localStorage.getItem("user"));
+const nameFromEmail = user?.email?.split('@')[0];
+console.log(nameFromEmail)
+
+
   return (
     <>
-      {/* Hero Section */}
+    <h3>Welcome, {nameFromEmail}</h3>
       <section
         style={{
           padding: "60px 40px",
@@ -39,6 +44,7 @@ export default function Home() {
           backgroundColor: "#f8fafc",
         }}
       >
+        
         <div style={{ maxWidth: "600px" }}>
           <h1 style={{ fontSize: "2.5rem", marginBottom: "20px", color: "#1f2937" }}>
             Ace Your Interviews with AI-Powered Practice

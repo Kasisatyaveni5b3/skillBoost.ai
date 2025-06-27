@@ -1,20 +1,19 @@
 import { useState, useEffect } from "react";
+import { BACKEND_URL } from "../config";
 
 export default function Practise() {
   const [topic, setTopic] = useState("");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
-  const [finalAnswer, setFinalAnswer] = useState(""); // ✅ to use in useEffect
+  const [finalAnswer, setFinalAnswer] = useState("");
   const [history, setHistory] = useState([]);
   const [experience, setExperience] = useState("");
   const [helpful, setHelpful] = useState(null);
-
-  // ✅ Save history once feedback is submitted
   useEffect(() => {
     const saveHistory = async () => {
       if (finalAnswer && helpful) {
         try {
-          const res = await fetch("http://localhost:5000/api/history", {
+          const res = await fetch(`${BACKEND_URL}/api/history`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -31,15 +30,12 @@ export default function Practise() {
         }
       }
     };
-
     saveHistory();
   }, [helpful]);
-
-  // ✅ Get answer on form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAnswer("Loading...");
-    setHelpful(null); // reset feedback
+    setHelpful(null);
 
     try {
       const res = await fetch("http://localhost:5000/api/ask", {
