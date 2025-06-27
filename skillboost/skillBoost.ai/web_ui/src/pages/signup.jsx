@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BACKEND_URL } from '../config';
 
 export default function SignUp() {
     const navigate = useNavigate()
@@ -10,7 +11,7 @@ export default function SignUp() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/signUp", {
+      const res = await fetch(`${BACKEND_UR}/api/signUp`, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, password ,email})
