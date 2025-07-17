@@ -1,5 +1,6 @@
 import FeatureCard from "../components/featureCard";
 import { useNavigate } from "react-router-dom";
+import Props from "./admin";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -130,4 +131,5 @@ console.log(nameFromEmail)
       </section>
     </>
   );
+
 }

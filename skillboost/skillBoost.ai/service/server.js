@@ -12,9 +12,11 @@ app.use(cors());
 dotenv.config();
 app.use(express.json());
 
-app.post("/api/ask", async (req, res) => {
-    const { topic, question, experience } = req.body;
-    const prompt = `Answer this ${topic} interview question clearly: ${question} with ${experience} level`;
+app.post("/api/ask-question", async (req, res) => {
+    const { topic, experience } = req.body;
+
+    const prompt = `You are an expert interviewer. Ask one scenario-based interview question for a ${experience} ${topic} developer. Only provide the question, no answers or explanation.`;
+
     try {
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
@@ -24,20 +26,16 @@ app.post("/api/ask", async (req, res) => {
             },
             body: JSON.stringify({
                 model: "llama3-8b-8192",
-                messages: [
-                    {
-                        role: "user",
-                        content: prompt,
-                    },
-                ],
-                temperature: 0.7,
+                messages: [{ role: "user", content: prompt }],
+                temperature: 0.8,
             }),
         });
+
         const result = await response.json();
-        const aiResponse = result.choices?.[0]?.message?.content || "No answer generated.";
-        res.json({ answer: aiResponse });
+        const aiQuestion = result.choices?.[0]?.message?.content || "No question generated.";
+        res.json({ question: aiQuestion });
     } catch (err) {
-        console.error("AI Error:", err.message);
+        console.error("Question Generation Error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });

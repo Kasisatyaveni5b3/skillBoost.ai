@@ -70,6 +70,12 @@ export default function Profile() {
           Don’t have an account? <a href="/signup">Create one here</a>.
         </p>
       </div>
+      <div>
+      </div>
     </div>
   );
+}
+
+export function SiblingB({message}) {
+  <input value={message}/>
 }
