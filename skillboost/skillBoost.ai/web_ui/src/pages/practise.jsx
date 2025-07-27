@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import instance  from "../axiosinstances";
+import { BACKEND_URL } from "../config";
 import MicComponent from "./voice";
 
 export default function Practise() {
@@ -18,7 +18,7 @@ export default function Practise() {
     const saveHistory = async () => {
       if (finalAnswer && helpful !== null) {
         try {
-          const res = await fetch(`${instance}/api/history`, {
+          const res = await fetch(`${BACKEND_URL}/api/history`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ topic, experience }),
@@ -38,7 +38,7 @@ export default function Practise() {
       return alert("Please write an answer before submitting.");
     try {
       setFinalAnswer("Evaluating your answer...");
-      const res = await fetch(`${instance}/api/answer`, {
+      const res = await fetch(`${BACKEND_URL}/api/answer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ answer: userAnswer }),
@@ -60,7 +60,7 @@ export default function Practise() {
     setUserAnswer("");
     try {
       debugger;
-      const res = await fetch(`${instance}/api/ask-question`, {
+      const res = await fetch(`${BACKEND_URL}/api/ask-question`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic, experience }),
