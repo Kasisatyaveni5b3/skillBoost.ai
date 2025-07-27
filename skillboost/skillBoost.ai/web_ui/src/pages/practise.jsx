@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { BACKEND_URL } from "../config";
+import instance  from "../axiosinstances";
+import MicComponent from "./voice";
 
 export default function Practise() {
   const [topic, setTopic] = useState("");
@@ -17,7 +18,7 @@ export default function Practise() {
     const saveHistory = async () => {
       if (finalAnswer && helpful !== null) {
         try {
-          const res = await fetch(`${BACKEND_URL}/api/history`, {
+          const res = await fetch(`${instance}/api/history`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ topic, experience }),
@@ -33,10 +34,11 @@ export default function Practise() {
   }, [helpful]);
 
   const handleAnswerSubmit = async () => {
-    if (!userAnswer.trim()) return alert("Please write an answer before submitting.");
+    if (!userAnswer.trim())
+      return alert("Please write an answer before submitting.");
     try {
       setFinalAnswer("Evaluating your answer...");
-      const res = await fetch(`${BACKEND_URL}/api/answer`, {
+      const res = await fetch(`${instance}/api/answer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ answer: userAnswer }),
@@ -50,13 +52,15 @@ export default function Practise() {
 
   const handleQuestionSubmit = async (e) => {
     e.preventDefault();
-    if (!experience || !role || !topic) return alert("Please select all fields before starting.");
+    if (!experience || !role || !topic)
+      return alert("Please select all fields before starting.");
     setQuestion("Loading question...");
     setHelpful(null);
     setFinalAnswer("");
     setUserAnswer("");
     try {
-      const res = await fetch(`${BACKEND_URL}/api/ask-question`, {
+      debugger;
+      const res = await fetch(`${instance}/api/ask-question`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic, experience }),
@@ -77,16 +81,53 @@ export default function Practise() {
   };
 
   return (
-    <div style={{ padding: "40px 20px", maxWidth: "900px", margin: "0 auto", fontFamily: "Inter, sans-serif" }}>
-      <h2 style={{ fontSize: "2rem", fontWeight: 600, marginBottom: "30px", color: "#1f2937", textAlign: "center" }}>
+    <div
+      style={{
+        padding: "40px 20px",
+        maxWidth: "900px",
+        margin: "0 auto",
+        fontFamily: "Inter, sans-serif",
+      }}
+    >
+      <h2
+        style={{
+          fontSize: "2rem",
+          fontWeight: 600,
+          marginBottom: "30px",
+          color: "#1f2937",
+          textAlign: "center",
+        }}
+      >
         Practice Your Interview Skills
       </h2>
 
-      <form onSubmit={handleQuestionSubmit} style={{ backgroundColor: "#ffffff", padding: "30px", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.06)", marginBottom: "40px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+      <form
+        onSubmit={handleQuestionSubmit}
+        style={{
+          backgroundColor: "#ffffff",
+          padding: "30px",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+          marginBottom: "40px",
+        }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "20px",
+          }}
+        >
           <div>
-            <label style={{ fontWeight: "bold", color: "#374151" }}>Experience Level</label>
-            <select value={experience} onChange={(e) => setExperience(e.target.value)} required style={selectStyle}>
+            <label style={{ fontWeight: "bold", color: "#374151" }}>
+              Experience Level
+            </label>
+            <select
+              value={experience}
+              onChange={(e) => setExperience(e.target.value)}
+              required
+              style={selectStyle}
+            >
               <option value="">-- Select Experience --</option>
               <option>0-1</option>
               <option>2</option>
@@ -100,7 +141,12 @@ export default function Practise() {
 
           <div>
             <label style={{ fontWeight: "bold", color: "#374151" }}>Role</label>
-            <select value={role} onChange={handleRoleChange} required style={selectStyle}>
+            <select
+              value={role}
+              onChange={handleRoleChange}
+              required
+              style={selectStyle}
+            >
               <option value="">-- Select Role --</option>
               <option>Frontend</option>
               <option>Backend</option>
@@ -109,8 +155,15 @@ export default function Practise() {
 
           {(frontend || backend) && (
             <div style={{ gridColumn: "1 / -1" }}>
-              <label style={{ fontWeight: "bold", color: "#374151" }}>Topic</label>
-              <select value={topic} onChange={(e) => setTopic(e.target.value)} required style={selectStyle}>
+              <label style={{ fontWeight: "bold", color: "#374151" }}>
+                Topic
+              </label>
+              <select
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                required
+                style={selectStyle}
+              >
                 <option value="">-- Select Topic --</option>
                 {frontend && (
                   <>
@@ -131,33 +184,57 @@ export default function Practise() {
           )}
         </div>
 
-        <button type="submit" style={submitBtnStyle}>🎯 Generate Question</button>
+        <button type="submit" style={submitBtnStyle}>
+          Generate Question
+        </button>
       </form>
 
       {question && (
-        <div style={{ marginBottom: "30px" }}>
-          <p style={{ fontWeight: 600, fontSize: "16px", color: "#111827" }}>{question}</p>
-          <div style={{ position: "relative" }}>
-            <textarea
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              placeholder="Type your answer here..."
-              style={{ ...textareaStyle }}
-            />
-            <i
-              className="fa-solid fa-arrow-up"
-              onClick={handleAnswerSubmit}
-              style={{ position: "absolute", right: "12px", bottom: "16px", color: "#2563eb", cursor: "pointer" }}
-              title="Submit Answer"
-            />
-          </div>
-        </div>
-      )}
+  <div className="mb-8">
+    <p className="text-lg font-semibold text-gray-800 mb-4">{question}</p>
+    
+    <div className="relative">
+      <textarea
+        value={userAnswer}
+        onChange={(e) => setUserAnswer(e.target.value)}
+        placeholder="Type your answer here..."
+        className="w-full min-h-[120px] p-4 pr-12 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y text-gray-700"
+      />
+
+      <div className="absolute bottom-4 right-4 flex items-center space-x-3">
+        <MicComponent className="text-blue-600 hover:text-blue-700 cursor-pointer" />
+
+        <i
+          className="fas fa-arrow-up text-blue-600 text-lg hover:text-blue-700 cursor-pointer"
+          onClick={handleAnswerSubmit}
+          title="Submit Answer"
+        />
+      </div>
+    </div>
+  </div>
+)}
+
 
       {finalAnswer && (
-        <div style={{ backgroundColor: "#f9fafb", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.05)" }}>
+        <div
+          style={{
+            backgroundColor: "#f9fafb",
+            padding: "20px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+          }}
+        >
           <strong style={{ color: "#1f2937" }}>Review:</strong>
-          <pre style={{ whiteSpace: "pre-wrap", fontSize: "14px", color: "#111827", marginTop: "10px" }}>{finalAnswer}</pre>
+          <pre
+            style={{
+              whiteSpace: "pre-wrap",
+              fontSize: "14px",
+              color: "#111827",
+              marginTop: "10px",
+            }}
+          >
+            {finalAnswer}
+          </pre>
         </div>
       )}
     </div>

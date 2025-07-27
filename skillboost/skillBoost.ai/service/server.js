@@ -14,7 +14,7 @@ app.use(express.json());
 
 app.post("/api/ask-question", async (req, res) => {
     const { topic, experience } = req.body;
-    const prompt = `You are an expert interviewer. Ask only one concise, interview question for a ${experience} ${topic} developer. Return only the question text — no scenario, no explanation, no formatting.`;
+    const prompt = `You are an expert technical interviewer. Ask one concise interview question at a time for a ${experience} ${topic} developer. Mix normal and scenario-based questions. Do not add explanations or formatting. Only return the question text.`;
     try {
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
@@ -40,15 +40,15 @@ app.post("/api/ask-question", async (req, res) => {
 
 app.post("/api/answer", async (req, res) => {
     const { answer } = req.body;
-  const sanitizedAnswer = answer.trim().replace(/"/g, '\\"');
-const prompt = `
+    const sanitizedAnswer = answer.trim().replace(/"/g, '\\"');
+    const prompt = `
 You are an expert Angular technical interviewer.
 
-Evaluate the following answer to a scenario-based question.
+Evaluate the candidate's answer to the interview question provided.
 
-Your output must include:
+Your response must include:
 1. A corrected answer (if needed) or say "Answer is not salvageable." if too vague.
-2. Clear, one-paragraph feedback on correctness, completeness, and clarity.
+2. One concise paragraph of feedback evaluating correctness, completeness, and clarity — only based on how well the answer addresses the question.
 3. A score out of 10 (integer only).
 
 Format your output exactly like this:
@@ -63,8 +63,6 @@ Score: <number>/10
 Candidate's Answer:
 """${sanitizedAnswer}"""
 `;
-
-
 
     try {
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
