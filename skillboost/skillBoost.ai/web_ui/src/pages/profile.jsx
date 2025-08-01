@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../config";
+import Button from "@mui/material/Button";
+import { Card, CardContent, Typography, TextField } from "@mui/material";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -9,73 +11,51 @@ export default function Profile() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      localStorage.setItem("user",JSON.stringify(data.user))
-      navigate("/home");
-      console.log("Login Response:", data);
-    } catch (err) {
-      console.error("Login Error:", err);
-    }
   }
 
   return (
     <div style={{ padding: "40px", maxWidth: "400px", margin: "0 auto" }}>
-      <h2>Login</h2>
+      <Typography variant="h6">
+        Sign in
+      </Typography>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={email}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Enter your name"
-          style={{
-            display: "block",
-            marginBottom: "10px",
-            width: "100%",
-            padding: "8px",
-          }}
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter your password"
-          style={{
-            display: "block",
-            marginBottom: "10px",
-            width: "100%",
-            padding: "8px",
-          }}
-        />
-        <button
-          type="submit"
-          style={{
-            backgroundColor: "#3b82f6",
-            color: "white",
-            padding: "10px",
-            border: "none",
-            borderRadius: "5px",
+        <Card
+          sx={{
+            width: "500px",
+            height: "400px",
+            margin: "auto",
+            marginTop: "10px",
+            boxShadow: 3,
+            borderRadius: 2,
           }}
         >
-          Login
-        </button>
+          <CardContent>
+            <TextField
+              label="Email"
+              variant="outlined"
+              fullWidth
+              sx={{ mb: 2 }}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <TextField
+              label="Password"
+              type="password"
+              variant="outlined"
+              fullWidth
+              sx={{ mb: 2 }}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button variant="contained" color="primary" type="submit">
+              Sign in
+            </Button>
+           <Typography sx={{ paddingTop: "10px" }}>
+              Don’t have an account? <a href="/signup">Create one here</a>.
+            </Typography>
+          </CardContent>
+        </Card>
       </form>
-      <div>
-        <p>
-          Don’t have an account? <a href="/signup">Create one here</a>.
-        </p>
-      </div>
-      <div>
-      </div>
+      <div></div>
+      <div></div>
     </div>
   );
-}
-
-export function SiblingB({message}) {
-  <input value={message}/>
 }

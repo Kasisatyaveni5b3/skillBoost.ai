@@ -3,9 +3,13 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const { fetch } = require("undici");
 const Login = require('./userModel');
-const { jwt } = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+
+const verificationToken = crypto.randomBytes(32).toString('hex');
 
 const app = express();
 app.use(cors());
@@ -105,18 +109,50 @@ app.post('/api/signUp', async (req, res) => {
     try {
         console.log(Login);
         const findUser = await Login.findOne({ email });
-        if (findUser) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
+        // if (findUser) {
+        //     return res.status(400).json({ message: 'User already exists' });
+        // }
+        await Login.deleteOne({ email: "kasisatyaveninukella@gmail.com" });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        await Login.create({ name, email, password: hashedPassword });
-
+        const newUser = await Login.create({ name, email, password: hashedPassword, isVerified: false });
+        const token = jwt.sign({ id: newUser._id }, verificationToken, { expiresIn: '1hr' });
+        console.log(token)
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'skillboostapp69@gmail.com',
+                pass: 'Skillboost@123'
+            }
+        })
+        const verificationLink = `http://localhost:5000/verify-email?token=${token}`;
+        await transporter.sendMail({
+            from: 'skillboostapp69@gmail.com',
+            to: email,
+            subject: 'Verify your email',
+            html: `<h3>Hello ${name}</h3>
+             <p>Please verify your email by clicking the link below:</p>
+             <a href="${verificationLink}">Verify Email</a>`,
+        })
         res.status(200).json({ message: 'User created successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
+app.get('/api/verify-email', async (req, res) => {
+    const { token } = req.query;
+    try {
+        const decoded = jwt.verify(token, verificationToken);
+        const user = await Login.findById(decoded.id);
+        if (!user) return res.status(400).send('Invalid token');
+        user.isVerified = true;
+        await user.save();
+        res.send('Email verified successfully!');
+    } catch (err) {
+        res.status(400).send('Invalid or expired token');
+    }
+});
+
 
 
 app.post('/api/login', async (req, res) => {

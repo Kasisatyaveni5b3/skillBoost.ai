@@ -27,7 +27,7 @@ export default function Navbar() {
           </Link>
         </nav>
       </header>
-      <main style={{ padding: "30px", minHeight: "70vh" }}>
+      <main style={{ padding: "30px", minHeight: "80vh" }}>
         <Outlet />
       </main>
       <footer

@@ -190,31 +190,29 @@ export default function Practise() {
       </form>
 
       {question && (
-  <div className="mb-8">
-    <p className="text-lg font-semibold text-gray-800 mb-4">{question}</p>
-    
-    <div className="relative">
-      <textarea
-        value={userAnswer}
-        onChange={(e) => setUserAnswer(e.target.value)}
-        placeholder="Type your answer here..."
-        className="w-full min-h-[120px] p-4 pr-12 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y text-gray-700"
-      />
+        <div className="mb-8">
+          <p className="text-lg font-semibold text-gray-800 mb-4">{question}</p>
 
-      <div className="absolute bottom-4 right-4 flex items-center space-x-3">
-        <MicComponent className="text-blue-600 hover:text-blue-700 cursor-pointer" />
+          <div className="relative">
+            <textarea
+              value={userAnswer}
+              onChange={(e) => setUserAnswer(e.target.value)}
+              placeholder="Type your answer here..."
+              className="w-full min-h-[120px] p-4 pr-12 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y text-gray-700"
+            />
 
-        <i
-          className="fas fa-arrow-up text-blue-600 text-lg hover:text-blue-700 cursor-pointer"
-          onClick={handleAnswerSubmit}
-          title="Submit Answer"
-        />
-      </div>
-    </div>
-  </div>
-)}
+            <div className="absolute bottom-4 right-4 flex items-center space-x-3">
+              <MicComponent className="text-blue-600 hover:text-blue-700 cursor-pointer" />
 
-
+              <i
+                className="fas fa-arrow-up text-blue-600 text-lg hover:text-blue-700 cursor-pointer"
+                onClick={handleAnswerSubmit}
+                title="Submit Answer"
+              />
+            </div>
+          </div>
+        </div>
+      )}
       {finalAnswer && (
         <div
           style={{
@@ -247,16 +245,6 @@ const selectStyle = {
   marginTop: "6px",
   borderRadius: "8px",
   border: "1px solid #d1d5db",
-};
-
-const textareaStyle = {
-  padding: "12px 40px 12px 12px",
-  width: "100%",
-  marginTop: "6px",
-  borderRadius: "8px",
-  border: "1px solid #d1d5db",
-  resize: "vertical",
-  minHeight: "120px",
 };
 
 const submitBtnStyle = {
