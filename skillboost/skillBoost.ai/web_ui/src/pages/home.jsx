@@ -1,9 +1,31 @@
 import FeatureCard from "../components/featureCard";
 import { useNavigate } from "react-router-dom";
-import Props from "./admin";
+import { useEffect, useState } from "react";
+import { BACKEND_URL } from "../config";
 
 export default function Home() {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/me`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch user");
+
+        const data = await res.json();
+        setUser(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchUser();
+  }, []);
 
   const features = [
     {
@@ -28,14 +50,23 @@ export default function Home() {
     },
   ];
 
-const user = JSON.parse(localStorage.getItem("user"));
-const nameFromEmail = user?.email?.split('@')[0];
-console.log(nameFromEmail)
+  const nameFromEmail = user?.email?.split("@")[0];
 
+  const handleStartPractice = () => {
+    if (!user || !user.email) {
+      alert("Please log in to start practicing.");
+      navigate("/login");
+    } else {
+      navigate("/practise");
+    }
+  };
 
   return (
     <>
-    <h3>Welcome, {nameFromEmail}</h3>
+      <h3 style={{ paddingLeft: "40px" }}>
+        {user ? `Welcome, ${nameFromEmail}` : "Welcome to SkillBoost.ai"}
+      </h3>
+
       <section
         style={{
           padding: "60px 40px",
@@ -45,13 +76,25 @@ console.log(nameFromEmail)
           backgroundColor: "#f8fafc",
         }}
       >
-        
         <div style={{ maxWidth: "600px" }}>
-          <h1 style={{ fontSize: "2.5rem", marginBottom: "20px", color: "#1f2937" }}>
+          <h1
+            style={{
+              fontSize: "2.5rem",
+              marginBottom: "20px",
+              color: "#1f2937",
+            }}
+          >
             Ace Your Interviews with AI-Powered Practice
           </h1>
-          <p style={{ fontSize: "1.1rem", marginBottom: "30px", color: "#374151" }}>
-            Practice real questions and get instant, intelligent feedback to sharpen your skills.
+          <p
+            style={{
+              fontSize: "1.1rem",
+              marginBottom: "30px",
+              color: "#374151",
+            }}
+          >
+            Practice real questions and get instant, intelligent feedback to
+            sharpen your skills.
           </p>
           <button
             style={{
@@ -63,7 +106,7 @@ console.log(nameFromEmail)
               fontSize: "1rem",
               cursor: "pointer",
             }}
-            onClick={() => navigate("/practise")}
+            onClick={handleStartPractice}
           >
             Start Practicing
           </button>
@@ -76,9 +119,15 @@ console.log(nameFromEmail)
         />
       </section>
 
-      {/* Features Section */}
       <section style={{ padding: "60px 40px", backgroundColor: "#fff" }}>
-        <h2 style={{ fontSize: "2rem", marginBottom: "30px", textAlign: "center", color: "#1f2937" }}>
+        <h2
+          style={{
+            fontSize: "2rem",
+            marginBottom: "30px",
+            textAlign: "center",
+            color: "#1f2937",
+          }}
+        >
           Key Features
         </h2>
 
@@ -101,7 +150,6 @@ console.log(nameFromEmail)
         </div>
       </section>
 
-      {/* Why Choose Us Section */}
       <section
         style={{
           padding: "60px 40px",
@@ -112,10 +160,22 @@ console.log(nameFromEmail)
         }}
       >
         <div style={{ maxWidth: "550px" }}>
-          <h2 style={{ fontSize: "2rem", marginBottom: "20px", color: "#1f2937" }}>
+          <h2
+            style={{
+              fontSize: "2rem",
+              marginBottom: "20px",
+              color: "#1f2937",
+            }}
+          >
             Why Choose SkillBoost.ai?
           </h2>
-          <ul style={{ paddingLeft: "20px", lineHeight: "1.8", color: "#374151" }}>
+          <ul
+            style={{
+              paddingLeft: "20px",
+              lineHeight: "1.8",
+              color: "#374151",
+            }}
+          >
             <li>Simple and easy to use interface</li>
             <li>Built specifically for frontend/backend developers</li>
             <li>Real-time AI-driven interview practice</li>
@@ -131,5 +191,4 @@ console.log(nameFromEmail)
       </section>
     </>
   );
-
 }
