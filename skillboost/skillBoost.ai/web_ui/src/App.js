@@ -22,7 +22,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="home" element={<Home />} />
           <Route path="practise" element={<Practise />} />
-          <Route path="login" element={<Profile />} />
+          <Route path="profile"lement={<Profile />} />
           <Route path="admin" element={<Admin />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="parent" element={< Parent />} />
