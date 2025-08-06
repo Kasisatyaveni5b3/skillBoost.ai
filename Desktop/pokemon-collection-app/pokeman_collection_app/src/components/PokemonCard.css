@@ -1,0 +1,90 @@
+.card {
+  background-color: white;
+  border-radius: 20px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.circle {
+  background: linear-gradient(to bottom right, #f953c6, #b91d73);
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.add-btn,
+.remove-btn {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  font-size: 20px;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  color: white;
+  cursor: pointer;
+}
+
+.add-btn {
+  background-color: #4caf50;
+}
+
+.remove-btn {
+  background-color: red;
+}
+
+h2 {
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.types {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.type {
+  padding: 4px 10px;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+  font-size: 1rem;
+  color: #444;
+}
+
+.stats strong {
+  color: #5555ff;
+  font-size: 1.2rem;
+}
