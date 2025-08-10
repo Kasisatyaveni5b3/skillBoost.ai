@@ -172,63 +172,147 @@ function TaskModal({ visible, range, onClose, onSave, initial }: {
 }
 
 // TaskBar: visual pill with move/resize handlers (retained)
-function TaskBar({ task, gridRef, monthStartIso, onUpdate }: { task: Task; gridRef: any; monthStartIso: string; onUpdate: (id: string, updates: Partial<Task>) => void }) {
-  const elRef = useRef<HTMLDivElement | null>(null);
-  const dragRef = useRef<{ type: 'move'|'left'|'right'|null; startX?: number; origStart?: string; origEnd?: string } | null>(null);
+
+function TaskBar({
+  task,
+  gridRef,
+  onUpdate,
+}: {
+  task: Task;
+  gridRef: React.RefObject<HTMLDivElement>;
+  onUpdate: (id: string, updates: Partial<Task>) => void;
+}) {
+  const dragRef = useRef<{
+    type: "move" | "left" | "right" | null;
+    startX?: number;
+    origStart?: string;
+    origEnd?: string;
+  } | null>(null);
 
   useEffect(() => {
     function onMove(e: MouseEvent) {
       if (!dragRef.current || !dragRef.current.type) return;
-      const deltaX = e.clientX - (dragRef.current.startX || 0);
       if (!gridRef.current) return;
-      const dayWidth = gridRef.current.clientWidth / 7; // approximate
+
+      const deltaX = e.clientX - (dragRef.current.startX || 0);
+      const gridWidth = gridRef.current.clientWidth;
+      if (gridWidth === 0) return; // avoid division by zero
+
+      const dayWidth = gridWidth / 7; // width of a day cell
       const deltaDays = Math.round(deltaX / dayWidth);
 
-      if (dragRef.current.type === 'move') {
+      // No change if deltaDays is 0 to reduce updates
+      if (deltaDays === 0) return;
+
+      if (dragRef.current.type === "move") {
         const origStart = dragRef.current.origStart!;
         const origEnd = dragRef.current.origEnd!;
-        const duration = Math.round((Date.parse(origEnd + 'T00:00:00') - Date.parse(origStart + 'T00:00:00')) / 86400000);
+        const duration =
+          (Date.parse(origEnd + "T00:00:00") - Date.parse(origStart + "T00:00:00")) /
+          86400000;
         const newStart = addDaysISO(origStart, deltaDays);
         const newEnd = addDaysISO(newStart, duration);
         onUpdate(task.id, { startDate: newStart, endDate: newEnd });
-      } else if (dragRef.current.type === 'left') {
+      } else if (dragRef.current.type === "left") {
         const newStart = addDaysISO(dragRef.current.origStart!, deltaDays);
-        if (cmpISO(newStart, task.endDate) <= 0) onUpdate(task.id, { startDate: newStart });
-      } else if (dragRef.current.type === 'right') {
+
+        // Enforce newStart <= endDate - 1 day (at least 1 day task)
+        const minStart = addDaysISO(task.endDate, -1);
+        if (cmpISO(newStart, minStart) <= 0) {
+          onUpdate(task.id, { startDate: newStart });
+        }
+      } else if (dragRef.current.type === "right") {
         const newEnd = addDaysISO(dragRef.current.origEnd!, deltaDays);
-        if (cmpISO(task.startDate, newEnd) <= 0) onUpdate(task.id, { endDate: newEnd });
+
+        // Enforce newEnd >= startDate + 1 day
+        const minEnd = addDaysISO(task.startDate, 1);
+        if (cmpISO(newEnd, minEnd) >= 0) {
+          onUpdate(task.id, { endDate: newEnd });
+        }
       }
     }
-    function onUp() { dragRef.current = null; document.body.style.userSelect = ''; }
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+
+    function onUp() {
+      dragRef.current = null;
+      document.body.style.userSelect = "";
+    }
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
   }, [gridRef, onUpdate, task]);
 
-  function startDrag(e: React.MouseEvent, type: 'move'|'left'|'right') {
+  function startDrag(e: React.MouseEvent, type: "move" | "left" | "right") {
     e.stopPropagation();
-    dragRef.current = { type, startX: e.clientX, origStart: task.startDate, origEnd: task.endDate };
-    document.body.style.userSelect = 'none';
+    dragRef.current = {
+      type,
+      startX: e.clientX,
+      origStart: task.startDate,
+      origEnd: task.endDate,
+    };
+    document.body.style.userSelect = "none";
   }
 
-  const colorMap: Record<Category, string> = { 'To Do': '#1890ff', 'In Progress': '#52c41a', 'Review': '#faad14', 'Completed': '#9254de' };
+  const colorMap: Record<Category, string> = {
+    "To Do": "#1890ff",
+    "In Progress": "#52c41a",
+    Review: "#faad14",
+    Completed: "#9254de",
+  };
 
   return (
-    <div ref={elRef} style={{ position: 'relative', marginBottom: 6 }}>
+    <div style={{ position: "relative", marginBottom: 6 }}>
       <div
-        onMouseDown={(e) => startDrag(e, 'move')}
-        style={{ display: 'inline-block', padding: '6px 10px', borderRadius: 8, background: colorMap[task.category], color: '#fff', cursor: 'grab', minWidth: 80 }}
+        onMouseDown={(e) => startDrag(e, "move")}
+        style={{
+          display: "inline-block",
+          padding: "6px 10px",
+          borderRadius: 8,
+          background: colorMap[task.category],
+          color: "#fff",
+          cursor: "grab",
+          minWidth: 80,
+          userSelect: "none",
+        }}
         title={`${task.name} (${task.startDate} → ${task.endDate})`}
       >
         <strong style={{ fontSize: 12 }}>{task.name}</strong>
       </div>
       {/* left handle */}
-      <div onMouseDown={(e) => startDrag(e, 'left')} style={{ position: 'absolute', left: -6, top: 0, bottom: 0, width: 10, cursor: 'ew-resize' }} />
+      <div
+        onMouseDown={(e) => startDrag(e, "left")}
+        style={{
+          position: "absolute",
+          left: -8,
+          top: 0,
+          bottom: 0,
+          width: 16,
+          cursor: "ew-resize",
+          zIndex: 10,
+          userSelect: "none",
+        }}
+      />
       {/* right handle */}
-      <div onMouseDown={(e) => startDrag(e, 'right')} style={{ position: 'absolute', right: -6, top: 0, bottom: 0, width: 10, cursor: 'ew-resize' }} />
+      <div
+        onMouseDown={(e) => startDrag(e, "right")}
+        style={{
+          position: "absolute",
+          right: -8,
+          top: 0,
+          bottom: 0,
+          width: 16,
+          cursor: "ew-resize",
+          zIndex: 10,
+          userSelect: "none",
+        }}
+      />
     </div>
   );
 }
+
 
 // Task card used in DnD wrapper
 function TaskCard({ task, onEdit, onDelete }: { task: Task; onEdit: (t: Task) => void; onDelete: (id: string) => void }) {
@@ -255,7 +339,7 @@ export default function MonthTaskPlanner() {
   const [tasks, setTasks] = useLocalStorage<Task[]>('month-planner.tasks', []);
   const [filters, setFilters] = useLocalStorage<Filters>('month-planner.filters', { categories: [], duration: null, search: '' });
 
-  const gridRef = useRef<HTMLDivElement | null>(null);
+  const gridRef = useRef<any>(null);
 
   // Selection state
   const drag = useRef<{ start: string; end: string } | null>(null);
@@ -392,24 +476,31 @@ export default function MonthTaskPlanner() {
                         </div>
                       ))}
 
-                      <Droppable droppableId={d.iso} type="TASKS">
-                        {(provided: any) => (
-                          <div ref={provided.innerRef} {...provided.droppableProps}>
-                            {anchored.map((task, i) => (
-                              <Draggable draggableId={task.id} index={i} key={task.id}>
-                                {(prov: any) => (
-                                  <div ref={prov.innerRef} {...prov.draggableProps} {...(prov.dragHandleProps ?? {})} style={{ ...prov.draggableProps.style }}>
-                                    <div onClick={(e) => { e.stopPropagation(); onTaskClick(task); }}>
-                                      <TaskCard task={task} onEdit={(t) => { setEditTask(t); setModalRange({ start: t.startDate, end: t.endDate }); }} onDelete={(id) => removeTask(id)} />
-                                    </div>
-                                  </div>
-                                )}
-                              </Draggable>
-                            ))}
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
+                     <Droppable droppableId={d.iso} type="TASKS">
+  {(provided: any) => (
+    <div ref={provided.innerRef} {...provided.droppableProps}>
+      {anchored.map((task, i) => (
+        <Draggable draggableId={task.id} index={i} key={task.id}>
+          {(prov: any) => (
+            <div
+              ref={prov.innerRef}
+              {...prov.draggableProps}
+              {...(prov.dragHandleProps ?? {})}
+              style={{ ...prov.draggableProps.style }}
+            >
+              <div onClick={(e) => { e.stopPropagation(); onTaskClick(task); }}>
+                {/* REPLACE TaskCard with TaskBar here: */}
+                <TaskBar task={task} gridRef={gridRef} onUpdate={updateTask} />
+              </div>
+            </div>
+          )}
+        </Draggable>
+      ))}
+      {provided.placeholder}
+    </div>
+  )}
+</Droppable>
+
 
                     </div>
                   </div>
