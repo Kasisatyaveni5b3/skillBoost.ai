@@ -10,7 +10,7 @@ function App() {
       <AppBar position="static" className="bg-red-600">
         <Toolbar className="flex justify-between">
           <div className="flex space-x-4">
-            
+            <h1>Pokeman Collection App</h1>
             <Button color="inherit" component={Link} to="/">Discover</Button>
             <Button color="inherit" component={Link} to="/collection">My Collection</Button>
           </div>

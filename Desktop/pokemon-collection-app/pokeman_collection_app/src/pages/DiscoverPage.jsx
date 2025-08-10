@@ -1,8 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import PokemonCard from '../components/PokemonCard';
 import { useCollection } from '../context/CollectionContext';
+import '../styles/DiscoverPage.css';
 
 const fetchPokemons = async ({ pageParam = 0 }) => {
   const res = await axios.get(`https://pokeapi.co/api/v2/pokemon?offset=${pageParam}&limit=20`);
@@ -20,7 +21,7 @@ const fetchPokemons = async ({ pageParam = 0 }) => {
 };
 
 export default function DiscoverPage() {
-  const { addToCollection } = useCollection();
+  const { collection, addToCollection } = useCollection();
   const bottomRef = useRef();
 
   const {
@@ -41,29 +42,39 @@ export default function DiscoverPage() {
       }
     });
 
-    if (bottomRef.current) observer.observe(bottomRef.current);
+    const currentBottomRef = bottomRef.current;
+    if (currentBottomRef) observer.observe(currentBottomRef);
 
     return () => {
-      if (bottomRef.current) observer.unobserve(bottomRef.current);
+      if (currentBottomRef) observer.unobserve(currentBottomRef);
     };
   }, [fetchNextPage, hasNextPage]);
 
-return (
-  <div className="p-4">
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-      {data?.pages.map((page, i) => (
-        <React.Fragment key={i}>
-          {page.results.map(pokemon => (
-            <PokemonCard key={pokemon.name} pokemon={pokemon} onAdd={addToCollection} />
-          ))}
-        </React.Fragment>
-      ))}
-    </div>
-    <div ref={bottomRef} className="h-10"></div>
-    {isFetchingNextPage && (
-      <p className="text-center text-gray-500 mt-4">Loading more Pokemon...</p>
-    )}
-  </div>
-);
+const isInCollection = (pokemon) =>
+  collection.some((p) => p.name === pokemon.name);
+console.log('🎯 Collection in DiscoverPage:', collection);
 
+
+  return (
+    <div className="custom-scroll-page">
+      <div className="custom-card-container">
+        {data?.pages.map((page, i) => (
+          <React.Fragment key={i}>
+            {page.results.map((pokemon) => (
+              <PokemonCard
+                key={pokemon.name}
+                pokemon={pokemon}
+                toggleCollection={addToCollection}
+                isInCollection={isInCollection(pokemon)}
+              />
+            ))}
+          </React.Fragment>
+        ))}
+      </div>
+      <div ref={bottomRef} className="loader-trigger" />
+      {isFetchingNextPage && (
+        <p className="text-center text-gray-500 mt-4">Loading more Pokémon...</p>
+      )}
+    </div>
+  );
 }

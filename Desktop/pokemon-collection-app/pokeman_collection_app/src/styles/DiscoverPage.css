@@ -1,0 +1,14 @@
+.custom-scroll-page {
+  padding: 16px;
+}
+
+.custom-card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.loader-trigger {
+  height: 10px;
+}
